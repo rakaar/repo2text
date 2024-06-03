@@ -92,7 +92,7 @@
                     if (item.type === 'file' && !['.png', '.jpg', '.jpeg', '.gif', '.bmp', '.tiff', '.ico'].some(ext => item.name.endsWith(ext))) {
                         const fileResponse = await fetch(item.download_url);
                         const fileText = await fileResponse.text();
-                        const fileType = item.name.split('.').pop();
+                        const fileType = item.name.includes('.') ? item.name.split('.').pop() : item.name;
                         const folder = path === '' ? '/' : `/${path.slice(0, -1)}`;
 
                         fileTypes.add(fileType);
@@ -168,22 +168,20 @@
         }
 
         document.addEventListener('change', (event) => {
-            if (event.target.classList.contains('type-checkbox')) {
+            if (event.target.classList.contains('type-checkbox') || event.target.classList.contains('folder-checkbox')) {
                 const fileType = event.target.getAttribute('data-filetype');
-                const checkboxes = document.querySelectorAll(`.file-entry[data-filetype="${fileType}"] .file-checkbox`);
-                checkboxes.forEach(checkbox => {
+                const fileTypeCheckboxes = document.querySelectorAll(`.file-entry[data-filetype="${fileType}"] .file-checkbox`);
+                fileTypeCheckboxes.forEach(checkbox => {
                     checkbox.checked = event.target.checked;
                 });
-            }
 
-            if (event.target.classList.contains('folder-checkbox')) {
                 const folder = event.target.getAttribute('data-folder');
-                const checkboxes = document.querySelectorAll(`.file-entry[data-folder="${folder}"] .file-checkbox`);
-                checkboxes.forEach(checkbox => {
+                const folderTypeCheckboxes = document.querySelectorAll(`.file-entry[data-folder="${folder}"] .file-checkbox`);
+                folderTypeCheckboxes.forEach(checkbox => {
                     checkbox.checked = event.target.checked;
                 });
-            }
 
+            }
             updateSelectAllCheckbox();
         });
 
