@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,35 +10,51 @@
             font-family: Arial, sans-serif;
             margin: 20px;
         }
-        input, button {
+
+        input,
+        button {
             margin: 10px 0;
         }
+
         input[type="text"] {
             width: 100%;
         }
+
         pre {
             background-color: #f4f4f4;
             padding: 10px;
             border: 1px solid #ddd;
             overflow-x: auto;
         }
+
         .file-entry {
             display: flex;
             align-items: center;
         }
-        #controls, #fileTypes, #folders {
+
+        #controls,
+        #fileTypes,
+        #folders {
             display: none;
         }
+
         .horizontal-list {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
         }
+
         .section-title {
             width: 100%;
         }
+
+        .read-more {
+            color: blue;
+            cursor: pointer;
+        }
     </style>
 </head>
+
 <body>
     <h1>GitHub Repo to Text</h1>
     <input type="text" id="repoUrl" placeholder="Enter GitHub repo URL">
@@ -47,8 +64,12 @@
         <input type="checkbox" id="selectAll" onclick="toggleSelectAll()"> Select All
         <button onclick="copyToClipboard()">Copy checked files to clipboard</button>
     </div>
-    <div id="fileTypes" class="horizontal-list section-title"><h3>File Types</h3></div>
-    <div id="folders" class="horizontal-list section-title"><h3>Folders</h3></div>
+    <div id="fileTypes" class="horizontal-list section-title">
+        <h3>File Types</h3>
+    </div>
+    <div id="folders" class="horizontal-list section-title">
+        <h3>Folders</h3>
+    </div>
     <div id="output"></div>
 
     <script>
@@ -113,7 +134,14 @@
                         heading.textContent = `Filepath: ${path}${item.name}`;
 
                         const pre = document.createElement('pre');
-                        pre.textContent = fileText;
+                        const fileLines = fileText.split('\n');
+                        const shortContent = fileLines.slice(0, 5).join('\n');
+                        pre.innerHTML = `${shortContent}${fileLines.length > 5 ? ' <span class="read-more" onclick="toggleReadMore(this)">Read more</span>' : ''}`;
+
+                        const fullContent = document.createElement('div');
+                        fullContent.style.display = 'none';
+                        fullContent.textContent = fileText;
+                        pre.appendChild(fullContent);
 
                         fileEntry.appendChild(checkbox);
                         fileEntry.appendChild(heading);
@@ -127,6 +155,17 @@
                 await Promise.all(filePromises);
             } else {
                 outputDiv.innerHTML += `<p>Error: ${contents.message}</p>`;
+            }
+        }
+
+        function toggleReadMore(element) {
+            const fullContent = element.nextElementSibling;
+            if (fullContent.style.display === 'none') {
+                fullContent.style.display = 'block';
+                element.textContent = 'Read less';
+            } else {
+                fullContent.style.display = 'none';
+                element.textContent = 'Read more';
             }
         }
 
@@ -165,25 +204,35 @@
                 checkbox.checked = selectAllChecked;
             });
 
+            updateFileCheckboxes();
         }
 
         document.addEventListener('change', (event) => {
+            // Check if the event is on a type or folder checkbox
             if (event.target.classList.contains('type-checkbox') || event.target.classList.contains('folder-checkbox')) {
-                const fileType = event.target.getAttribute('data-filetype');
-                const fileTypeCheckboxes = document.querySelectorAll(`.file-entry[data-filetype="${fileType}"] .file-checkbox`);
-                fileTypeCheckboxes.forEach(checkbox => {
-                    checkbox.checked = event.target.checked;
-                });
-
-                const folder = event.target.getAttribute('data-folder');
-                const folderTypeCheckboxes = document.querySelectorAll(`.file-entry[data-folder="${folder}"] .file-checkbox`);
-                folderTypeCheckboxes.forEach(checkbox => {
-                    checkbox.checked = event.target.checked;
-                });
-
+                console.log('Checkbox changed: ', event.target); // Log the changed checkbox
+                updateFileCheckboxes();
+                updateSelectAllCheckbox();
             }
-            updateSelectAllCheckbox();
         });
+
+        function updateFileCheckboxes() {
+            const selectedTypes = Array.from(document.querySelectorAll('.type-checkbox:checked')).map(checkbox => checkbox.getAttribute('data-filetype'));
+            const selectedFolders = Array.from(document.querySelectorAll('.folder-checkbox:checked')).map(checkbox => checkbox.getAttribute('data-folder'));
+
+            const fileEntries = document.querySelectorAll('.file-entry');
+            fileEntries.forEach(entry => {
+                const fileType = entry.getAttribute('data-filetype');
+                const folder = entry.getAttribute('data-folder');
+                const checkbox = entry.querySelector('.file-checkbox');
+
+                if (selectedTypes.includes(fileType) && selectedFolders.includes(folder)) {
+                    checkbox.checked = true;
+                } else {
+                    checkbox.checked = false;
+                }
+            });
+        }
 
         function updateSelectAllCheckbox() {
             const fileCheckboxes = document.querySelectorAll('.file-checkbox');
@@ -206,4 +255,5 @@
         }
     </script>
 </body>
+
 </html>
