@@ -207,10 +207,9 @@
             updateFileCheckboxes();
         }
 
-        document.addEventListener('change', (event) => {
+        document.addEventListener('click', (event) => {
             // Check if the event is on a type or folder checkbox
             if (event.target.classList.contains('type-checkbox') || event.target.classList.contains('folder-checkbox')) {
-                console.log('Checkbox changed: ', event.target); // Log the changed checkbox
                 updateFileCheckboxes();
                 updateSelectAllCheckbox();
             }
@@ -219,6 +218,9 @@
         function updateFileCheckboxes() {
             const selectedTypes = Array.from(document.querySelectorAll('.type-checkbox:checked')).map(checkbox => checkbox.getAttribute('data-filetype'));
             const selectedFolders = Array.from(document.querySelectorAll('.folder-checkbox:checked')).map(checkbox => checkbox.getAttribute('data-folder'));
+
+            console.log('Selected File Types:', selectedTypes); // Log selected file types
+            console.log('Selected Folders:', selectedFolders); // Log selected folders
 
             const fileEntries = document.querySelectorAll('.file-entry');
             fileEntries.forEach(entry => {
@@ -238,6 +240,12 @@
             const fileCheckboxes = document.querySelectorAll('.file-checkbox');
             const allChecked = Array.from(fileCheckboxes).every(checkbox => checkbox.checked);
             document.getElementById('selectAll').checked = allChecked;
+
+            const selectedTypes = Array.from(document.querySelectorAll('.type-checkbox:checked')).map(checkbox => checkbox.getAttribute('data-filetype'));
+            const selectedFolders = Array.from(document.querySelectorAll('.folder-checkbox:checked')).map(checkbox => checkbox.getAttribute('data-folder'));
+
+            console.log('Selected File Types:', selectedTypes); // Log selected file types
+            console.log('Selected Folders:', selectedFolders); // Log selected folders
         }
 
         function copyToClipboard() {
