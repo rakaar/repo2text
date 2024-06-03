@@ -106,8 +106,8 @@
                         const checkbox = document.createElement('input');
                         checkbox.type = 'checkbox';
                         checkbox.classList.add('file-checkbox');
-                        checkbox.checked = true;
                         checkbox.setAttribute('data-content', `Filepath: ${path}${item.name}\n${fileText}\n\n`);
+                        checkbox.checked = true;
 
                         const heading = document.createElement('h3');
                         heading.textContent = `Filepath: ${path}${item.name}`;
@@ -148,11 +148,23 @@
         }
 
         function toggleSelectAll() {
-            const checkboxes = document.querySelectorAll('.file-checkbox');
             const selectAllChecked = document.getElementById('selectAll').checked;
-            checkboxes.forEach(checkbox => {
+            const fileCheckboxes = document.querySelectorAll('.file-checkbox');
+            const typeCheckboxes = document.querySelectorAll('.type-checkbox');
+            const folderCheckboxes = document.querySelectorAll('.folder-checkbox');
+
+            fileCheckboxes.forEach(checkbox => {
                 checkbox.checked = selectAllChecked;
             });
+
+            typeCheckboxes.forEach(checkbox => {
+                checkbox.checked = selectAllChecked;
+            });
+
+            folderCheckboxes.forEach(checkbox => {
+                checkbox.checked = selectAllChecked;
+            });
+
         }
 
         document.addEventListener('change', (event) => {
@@ -171,7 +183,15 @@
                     checkbox.checked = event.target.checked;
                 });
             }
+
+            updateSelectAllCheckbox();
         });
+
+        function updateSelectAllCheckbox() {
+            const fileCheckboxes = document.querySelectorAll('.file-checkbox');
+            const allChecked = Array.from(fileCheckboxes).every(checkbox => checkbox.checked);
+            document.getElementById('selectAll').checked = allChecked;
+        }
 
         function copyToClipboard() {
             const checkedFiles = document.querySelectorAll('.file-checkbox:checked');
